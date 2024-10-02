@@ -31,6 +31,7 @@ An outline that covers all of the details (at a high level) and is structured as
 
 {{outline_template}}
 
+- Your outline should contain between 3 and 5 sections. We don't want to overwhelm the learner with too much information, but we also want to make sure that we cover all of the important details.
 - ONLY output the XML content of your outline. Do not include any preamble or other text. I'll be parsing this with an XML parser, so if you include any text outside of the XML, the parser will throw an error.
 """
 
@@ -41,7 +42,7 @@ def construct_outliner_system_prompt() -> str:
     )
     outliner_system_template = outliner_system_template.replace(
         "{{section_content}}",
-        "<!-- The recommended content for the section, which should just be plain English describing the types of things this section should cover. -->",
+        "<!-- The recommended content for the section, which should just be plain English describing the types of things this section should cover. Try to be specific here, so that you remember later all the things you want to cover. -->",
     )
     outliner_system_template = outliner_system_template.replace(
         "{{additional_sections_note}}",

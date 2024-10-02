@@ -6,6 +6,7 @@ from fastapi.responses import HTMLResponse, FileResponse
 from ratelimiter import RateLimitMiddleware
 from openai import AsyncOpenAI
 from pydantic import BaseModel
+from xml.etree import ElementTree as ET
 
 load_dotenv(override=True)
 
@@ -63,10 +64,54 @@ class Topic(BaseModel):
 
 @app.post("/api/generate")
 async def generate_knowledge(topic: Topic):
-    # This is where you'll implement the LLM call to generate content
-    # For now, we'll return a placeholder response
-    generated_content = f"# Knowledge about {topic.topic}\n\nThis is where the generated content about {topic.topic} would appear."
-    return {"content": generated_content}
+    from prompts import (
+        construct_outliner_system_prompt,
+        construct_outliner_user_prompt,
+        construct_knowledge_generator_system_prompt,
+        construct_knowledge_generator_user_prompt,
+    )
+
+    outliner_system_prompt = construct_outliner_system_prompt()
+    outliner_user_prompt = construct_outliner_user_prompt(topic.topic)
+
+    try:
+        # outliner_response = """"""
+
+        response = await client.chat.completions.create(
+            model=LLM_MODEL,
+            messages=[
+                {"role": "system", "content": outliner_system_prompt},
+                {"role": "user", "content": outliner_user_prompt},
+            ],
+        )
+
+        outliner_response = response.choices[0].message.content
+
+        # Parse the XML string
+        root = ET.fromstring(outliner_response)
+
+        # Extract topic
+        topic = root.find("topic").text
+
+        # Extract sections and create prompts
+        section_prompts = []
+        for section in root.find("sections").findall("section"):
+            title = section.find("title").text
+            section_prompts.append(
+                f"Write a detailed section about '{title}' for the topic '{topic}'."
+            )
+
+        # Now you have a list of prompts in section_prompts
+        # You can use these to generate content for each section
+        for section_prompt in section_prompts:
+            print("\nSection Prompt: ", section_prompt)
+
+    except ET.ParseError as e:
+        return {"error": f"XML parsing error: {str(e)}", "content": outliner_response}
+    except Exception as e:
+        return {"error": str(e), "content": ""}
+
+    return {"content": outliner_response, "section_prompts": section_prompts}
 
 
 @app.get("/")
