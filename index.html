@@ -4,42 +4,84 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Knowledge Generator</title>
-    <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/chota@latest">
     <style>
+      :root {
+        --bg-color: #DDD6B6;
+        --bg-secondary-color: #BDA38D;
+        --font-color: #593831;
+        --color-primary: #A62E2E;
+        --input-border-color: #8C5E54;
+        --color-lightGrey: #A62E2E;
+      }
+
       body {
-        font-family: Arial, sans-serif;
         max-width: 800px;
         margin: 0 auto;
         padding: 20px;
+        background-color: var(--bg-color);
       }
-      textarea {
-        width: 100%;
+
+      #topic-input {
         height: 100px;
-        margin-bottom: 10px;
+        margin-bottom: 2em;
+        background-color: #F0EDE0;
+        border: 1px solid var(--input-border-color);
+        color: var(--font-color);
       }
-      button {
-        padding: 10px 20px;
-        margin-right: 10px;
+
+      #topic-input::placeholder {
+        color: var(--bg-secondary-color);
       }
+
+      .button.primary.outline:hover {
+        background-color: var(--color-primary);
+        color: #FFF;
+      }
+
       #output {
-        margin-top: 20px;
+        display: none;
+        margin-top: 50px;
         border: 1px solid #ccc;
         padding: 10px;
         white-space: pre-wrap;
       }
+
+      #output.ready {
+        display: block;
+      }
+
+      #buttons-container {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      #copy-btn {
+        display: none;
+      }
+
+      #copy-btn.ready {
+        display: inline-block;
+      }
     </style>
   </head>
   <body>
-    <h1>Knowledge Generator</h1>
-    <textarea id="topicInput" placeholder="Enter the topic(s) you want to learn about..."></textarea>
-    <button id="generateBtn">Generate</button>
-    <button id="copyBtn" style="display: none">Copy Content</button>
+    <h2>Knowledge Generator</h2>
+
+    <textarea id="topic-input" placeholder="Enter the topic you want to learn about. Feel free to add any specific details that you want to make sure are covered."></textarea>
+    
+    <div id="buttons-container">
+      <button id="generate-btn" class="button primary">Generate</button>
+      <button id="copy-btn" class="button primary outline">Copy Content</button>
+    </div>
+
     <div id="output"></div>
 
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
     <script>
-      const topicInput = document.getElementById("topicInput")
-      const generateBtn = document.getElementById("generateBtn")
-      const copyBtn = document.getElementById("copyBtn")
+      const topicInput = document.getElementById("topic-input")
+      const generateBtn = document.getElementById("generate-btn")
+      const copyBtn = document.getElementById("copy-btn")
       const output = document.getElementById("output")
       const md = window.markdownit()
 
@@ -47,16 +89,19 @@
       copyBtn.addEventListener("click", copyContent)
 
       async function generateKnowledge() {
+        // Make sure we don't show any buttons or content that we shouldn't.
+        copyBtn.classList.remove("ready")
+        output.classList.remove("ready")
+
         const topic = topicInput.value.trim()
+        
         if (!topic) {
-          alert("Please enter a topic")
           return
         }
 
         generateBtn.disabled = true
         generateBtn.textContent = "Generating..."
-        output.innerHTML = "Generating knowledge..."
-        copyBtn.style.display = "none"
+        output.innerHTML = ""
 
         const requestBody = JSON.stringify({ topic })
 
@@ -75,7 +120,8 @@
 
           const data = await response.json()
           output.innerHTML = md.render(data.content)
-          copyBtn.style.display = "inline-block"
+          copyBtn.classList.add("ready")
+          output.classList.add("ready")
         } catch (error) {
           output.textContent = `Error: ${error.message}`
         } finally {

@@ -28,10 +28,6 @@ elif LLM_PROVIDER == "openrouter":
 app = FastAPI()
 
 
-class Topic(BaseModel):
-    topic: str
-
-
 # Add the rate limiting middleware
 app.add_middleware(
     RateLimitMiddleware,
@@ -60,9 +56,13 @@ else:
 client = AsyncOpenAI(api_key=LLM_API_KEY, base_url=API_BASE_URL)
 
 
+# Define the model for the incoming topic request
+class Topic(BaseModel):
+    topic: str
+
+
 @app.post("/api/generate")
 async def generate_knowledge(topic: Topic):
-    print(topic)
     # This is where you'll implement the LLM call to generate content
     # For now, we'll return a placeholder response
     generated_content = f"# Knowledge about {topic.topic}\n\nThis is where the generated content about {topic.topic} would appear."
