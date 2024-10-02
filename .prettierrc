@@ -1,0 +1,10 @@
+{
+  "tabWidth": 2,
+  "useTabs": false,
+  "lineWidth": 120,
+  "printWidth": 120,
+  "singleAttributePerLine": false,
+  "semi": false,
+  "vueIndentScriptAndStyle": false,
+  "htmlWhitespaceSensitivity": "ignore"
+}

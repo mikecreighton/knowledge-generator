@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Knowledge Generator</title>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      textarea {
+        width: 100%;
+        height: 100px;
+        margin-bottom: 10px;
+      }
+      button {
+        padding: 10px 20px;
+        margin-right: 10px;
+      }
+      #output {
+        margin-top: 20px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Knowledge Generator</h1>
+    <textarea id="topicInput" placeholder="Enter the topic(s) you want to learn about..."></textarea>
+    <button id="generateBtn">Generate</button>
+    <button id="copyBtn" style="display: none">Copy Content</button>
+    <div id="output"></div>
+
+    <script>
+      const topicInput = document.getElementById("topicInput")
+      const generateBtn = document.getElementById("generateBtn")
+      const copyBtn = document.getElementById("copyBtn")
+      const output = document.getElementById("output")
+      const md = window.markdownit()
+
+      generateBtn.addEventListener("click", generateKnowledge)
+      copyBtn.addEventListener("click", copyContent)
+
+      async function generateKnowledge() {
+        const topic = topicInput.value.trim()
+        if (!topic) {
+          alert("Please enter a topic")
+          return
+        }
+
+        generateBtn.disabled = true
+        generateBtn.textContent = "Generating..."
+        output.innerHTML = "Generating knowledge..."
+        copyBtn.style.display = "none"
+
+        const requestBody = JSON.stringify({ topic })
+
+        try {
+          const response = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: requestBody,
+          })
+
+          if (!response.ok) {
+            throw new Error("Failed to generate knowledge")
+          }
+
+          const data = await response.json()
+          output.innerHTML = md.render(data.content)
+          copyBtn.style.display = "inline-block"
+        } catch (error) {
+          output.textContent = `Error: ${error.message}`
+        } finally {
+          generateBtn.disabled = false
+          generateBtn.textContent = "Generate"
+        }
+      }
+
+      function copyContent() {
+        const content = output.innerText
+        navigator.clipboard
+          .writeText(content)
+          .then(() => {
+            alert("Content copied to clipboard!")
+          })
+          .catch((err) => {
+            console.error("Failed to copy: ", err)
+          })
+      }
+    </script>
+  </body>
+</html>

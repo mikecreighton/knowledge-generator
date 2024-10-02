@@ -1,9 +1,11 @@
 import os
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse, FileResponse
 from ratelimiter import RateLimitMiddleware
 from openai import AsyncOpenAI
+from pydantic import BaseModel
 
 load_dotenv(override=True)
 
@@ -24,6 +26,12 @@ elif LLM_PROVIDER == "openrouter":
     DEFAULT_LLM_MODEL = "anthropic/claude-3.5-sonnet"
 
 app = FastAPI()
+
+
+class Topic(BaseModel):
+    topic: str
+
+
 # Add the rate limiting middleware
 app.add_middleware(
     RateLimitMiddleware,
@@ -45,16 +53,25 @@ else:
         CORSMiddleware,
         allow_origins=[os.getenv("FRONTEND_ORIGIN")],
         allow_credentials=True,
-        allow_methods=["POST", "OPTIONS"],
+        allow_methods=["GET", "POST", "OPTIONS"],
         allow_headers=["*"],
     )
 
 client = AsyncOpenAI(api_key=LLM_API_KEY, base_url=API_BASE_URL)
 
 
+@app.post("/api/generate")
+async def generate_knowledge(topic: Topic):
+    print(topic)
+    # This is where you'll implement the LLM call to generate content
+    # For now, we'll return a placeholder response
+    generated_content = f"# Knowledge about {topic.topic}\n\nThis is where the generated content about {topic.topic} would appear."
+    return {"content": generated_content}
+
+
 @app.get("/")
-def read_root():
-    return {"message": "Hello World"}
+async def read_index():
+    return FileResponse("index.html")
 
 
 # -----------------------------------------
