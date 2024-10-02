@@ -13,6 +13,7 @@
         --color-primary: #A62E2E;
         --input-border-color: #8C5E54;
         --color-lightGrey: #A62E2E;
+        --bg-output: #E0DABD;
       }
 
       body {
@@ -23,11 +24,13 @@
       }
 
       #topic-input {
-        height: 100px;
+        height: 160px;
         margin-bottom: 2em;
         background-color: #F0EDE0;
         border: 1px solid var(--input-border-color);
         color: var(--font-color);
+        border-radius: 8px;
+        padding: 16px 16px;
       }
 
       #topic-input::placeholder {
@@ -41,10 +44,11 @@
 
       #output {
         display: none;
-        margin-top: 50px;
-        border: 1px solid #ccc;
-        padding: 10px;
-        white-space: pre-wrap;
+        margin-top: 40px;
+        border: 1px solid var(--bg-secondary-color);
+        border-radius: 8px;
+        background-color: var(--bg-output);
+        padding: 20px 30px;
       }
 
       #output.ready {
@@ -53,15 +57,38 @@
 
       #buttons-container {
         display: flex;
-        justify-content: space-between;
+        flex-direction: column;
+
+        .button+.button {
+          margin-left: 0;
+          margin-top: 1rem;
+        }
+
+        > * {
+          width: 100%;
+        }
+
+        @media screen and (min-width: 600px) {
+          flex-direction: row;  
+          justify-content: space-between;
+
+          .button+.button {
+            margin-top: 0;
+          }
+
+          > * {
+            width: 180px;
+          }
+        }
       }
 
-      #copy-btn {
+      .copy-btn {
         display: none;
       }
 
-      #copy-btn.ready {
+      .copy-btn.ready {
         display: inline-block;
+        width: 240px;
       }
     </style>
   </head>
@@ -72,7 +99,7 @@
     
     <div id="buttons-container">
       <button id="generate-btn" class="button primary">Generate</button>
-      <button id="copy-btn" class="button primary outline">Copy Content</button>
+      <button id="copy-md-btn" class="copy-btn button primary outline">Copy</button>
     </div>
 
     <div id="output"></div>
@@ -81,16 +108,18 @@
     <script>
       const topicInput = document.getElementById("topic-input")
       const generateBtn = document.getElementById("generate-btn")
-      const copyBtn = document.getElementById("copy-btn")
+      const copyMdBtn = document.getElementById("copy-md-btn")
+      const copyMdBtnLabel = copyMdBtn.textContent
       const output = document.getElementById("output")
       const md = window.markdownit()
+      let rawContent = ""
 
       generateBtn.addEventListener("click", generateKnowledge)
-      copyBtn.addEventListener("click", copyContent)
+      copyMdBtn.addEventListener("click", copyContent)
 
       async function generateKnowledge() {
         // Make sure we don't show any buttons or content that we shouldn't.
-        copyBtn.classList.remove("ready")
+        copyMdBtn.classList.remove("ready")
         output.classList.remove("ready")
 
         const topic = topicInput.value.trim()
@@ -102,6 +131,7 @@
         generateBtn.disabled = true
         generateBtn.textContent = "Generating..."
         output.innerHTML = ""
+        rawContent = ""
 
         const requestBody = JSON.stringify({ topic })
 
@@ -119,8 +149,9 @@
           }
 
           const data = await response.json()
-          output.innerHTML = md.render(data.content)
-          copyBtn.classList.add("ready")
+          rawContent = data.content
+          output.innerHTML = md.render(rawContent)
+          copyMdBtn.classList.add("ready")
           output.classList.add("ready")
         } catch (error) {
           output.textContent = `Error: ${error.message}`
@@ -130,12 +161,21 @@
         }
       }
 
-      function copyContent() {
-        const content = output.innerText
+      function copyContent(event) {
+        const btn = event.target
+        const content = rawContent
         navigator.clipboard
           .writeText(content)
           .then(() => {
-            alert("Content copied to clipboard!")
+            btn.textContent = "Copied!"
+            btn.classList.remove("outline")
+            btn.classList.add("success")
+
+            setTimeout(() => {
+              btn.classList.add("outline")
+              btn.classList.remove("success")
+              btn.textContent = copyMdBtnLabel
+            }, 1000)
           })
           .catch((err) => {
             console.error("Failed to copy: ", err)

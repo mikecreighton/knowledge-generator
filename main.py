@@ -29,11 +29,11 @@ app = FastAPI()
 
 
 # Add the rate limiting middleware
-app.add_middleware(
-    RateLimitMiddleware,
-    limit=5,
-    window=60,
-)
+# app.add_middleware(
+#     RateLimitMiddleware,
+#     limit=5,
+#     window=60,
+# )
 
 # CORS configuration
 if os.getenv("SERVER_ENV") == "development":
