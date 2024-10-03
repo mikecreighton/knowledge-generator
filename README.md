@@ -11,6 +11,8 @@ Also, you can just read it, becuase it'll be a nice, organized document about th
 
 _Note_: Large language models (LLMs), which generate the content, are prone to hallucinations. This means that the content may not be accurate or complete. It is up to you to fact check the content for accuracy. Also, because of the nature of how LLMs are trained, each LLM has a different knowledge cut-off point, so you may find that recent information is missing from the content.
 
+_Another Note_: This was hastily put together because I wanted to help my kids with resources for some of their interests, so it'll probably have bugs or I'll have overlooked something.
+
 ## Requirements
 
 - Python 3.10+
