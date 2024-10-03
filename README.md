@@ -1,5 +1,5 @@
 # Knowledge Generator
-A simple tool for generating information about a topic to be fed into NotebookLM.
+A simple tool for generating information about a topic to be fed into [NotebookLM](https://notebooklm.google.com/).
 
 ## Description
 
