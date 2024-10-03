@@ -31,8 +31,9 @@ An outline that covers all of the details (at a high level) and is structured as
 
 {{outline_template}}
 
-- Your outline should contain between 3 and 5 sections. We don't want to overwhelm the learner with too much information, but we also want to make sure that we cover all of the important details.
+- Your outline should contain between 5 and 8 sections. It's good to go into sufficient enough detail that each section could stand on its own as a separate knowledge article.
 - ONLY output the XML content of your outline. Do not include any preamble or other text. I'll be parsing this with an XML parser, so if you include any text outside of the XML, the parser will throw an error.
+- ONLY XML!!!
 """
 
 
