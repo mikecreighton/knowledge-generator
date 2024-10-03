@@ -14,7 +14,7 @@ _Note_: Large language models (LLMs), which generate the content, are prone to h
 ## Requirements
 
 - Python 3.10+
-- An OpenAI API key or an OpenRouter API key
+- An [OpenAI API key](https://openai.com/index/openai-api/) or an [OpenRouter API key](https://openrouter.ai/)
 
 ## Running the app locally
 
