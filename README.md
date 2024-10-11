@@ -20,7 +20,7 @@ _Another Note_: This was hastily put together because I wanted to help my kids w
 
 ## Running the app locally
 
-1. Copy the `.env.example` file to `.env` and set the appropriate environment variables.
+1. Copy the `.env.template` file to `.env` and set the appropriate environment variables.
 
 2. Create a virtual environment and install dependencies:
 
